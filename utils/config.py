@@ -23,7 +23,8 @@ audio_params = {
 }
 
 # paths
-data_dir = "/kaggle/input/tensorflow-speech-recognition-challenge/train/audio"
+# data_dir = "/kaggle/input/tensorflow-speech-recognition-challenge/train/audio"
+data_dir = "/kaggle/working/train/audio"
 trained_models_dir = "./trained_models"
 
 # experiment configurations with dynamic parameters
