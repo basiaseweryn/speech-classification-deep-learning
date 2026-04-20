@@ -81,6 +81,8 @@ def get_dataloaders(exp_config, num_workers=4):
     reduced = exp_config.get("reduced_classes", False)
     classes = SUBSET_CLASSES if reduced else ALL_CLASSES
     
+    use_pin_memory = torch.cuda.is_available()
+    
     full_ds = SpeechDataset(data_dir, classes, subset_mode=reduced)
     train_size = int(0.8 * len(full_ds))
     val_size = len(full_ds) - train_size
@@ -88,6 +90,18 @@ def get_dataloaders(exp_config, num_workers=4):
     generator = torch.Generator().manual_seed(42)
     train_ds, val_ds = torch.utils.data.random_split(full_ds, [train_size, val_size], generator=generator)
     
-    train_loader = DataLoader(train_ds, batch_size=exp_config["batch_size"], shuffle=True, num_workers=num_workers, pin_memory=True)
-    val_loader = DataLoader(val_ds, batch_size=exp_config["batch_size"], shuffle=False, num_workers=num_workers, pin_memory=True)
+    train_loader = DataLoader(
+        train_ds, 
+        batch_size=exp_config["batch_size"], 
+        shuffle=True, 
+        num_workers=num_workers, 
+        pin_memory=use_pin_memory
+    )
+    val_loader = DataLoader(
+        val_ds, 
+        batch_size=exp_config["batch_size"], 
+        shuffle=False, 
+        num_workers=num_workers, 
+        pin_memory=use_pin_memory
+    )
     return train_loader, val_loader
