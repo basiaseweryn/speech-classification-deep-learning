@@ -24,7 +24,7 @@ experiments = {
         "batch_size": 64,
         "lr": 0.001,
         "scheduler": "ReduceLROnPlateau",
-        "reduced_classes": True
+        # "reduced_classes": True
     },
     "stage_2_cnn_investigation_filters": {
         "model_type": "BaselineCNN",
@@ -33,7 +33,7 @@ experiments = {
         "batch_size": 64,
         "lr": 0.001,
         "scheduler": "StepLR",
-        "reduced_classes": True
+        # "reduced_classes": True
     },
     "stage_2_transformer_scratch_default": {
         "model_type": "TransformerScratch",
@@ -42,7 +42,7 @@ experiments = {
         "batch_size": 32,
         "lr": 0.0005,
         "scheduler": "CosineAnnealingLR",
-        "reduced_classes": True
+        # "reduced_classes": True
     },
     "stage_2_transformer_pretrained_freeze": {
         "model_type": "PretrainedTransformer",
@@ -51,6 +51,6 @@ experiments = {
         "batch_size": 32,
         "lr": 0.0001,
         "scheduler": "ReduceLROnPlateau",
-        "reduced_classes": True
+        # "reduced_classes": True
     }
 }
