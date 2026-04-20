@@ -1,19 +1,10 @@
 import os
 
-# global seed for reproducibility
 seed = 42
 
-# working mode flag
-use_subset = True
+ALL_CLASSES = ["yes", "no", "up", "down", "left", "right", "on", "off", "stop", "go", "silence", "unknown"]
+SUBSET_CLASSES = ["yes", "no", "up", "down"]
 
-# classes definition
-all_classes = ["yes", "no", "up", "down", "left", "right", "on", "off", "stop", "go", "silence", "unknown"]
-subset_classes = ["yes", "no", "up", "down"]
-
-active_classes = subset_classes if use_subset else all_classes
-num_classes = len(active_classes)
-
-# audio parameters
 audio_params = {
     "sample_rate": 16000,
     "duration": 1.0,
@@ -22,12 +13,9 @@ audio_params = {
     "hop_length": 512,
 }
 
-# paths
-# data_dir = "/kaggle/input/tensorflow-speech-recognition-challenge/train/audio"
-data_dir = "/kaggle/working/train/train/audio"
+data_dir = "/kaggle/working/train/audio"
 trained_models_dir = "./trained_models"
 
-# experiment configurations with dynamic parameters
 experiments = {
     "stage_1_baseline_cnn_default": {
         "model_type": "BaselineCNN",
@@ -35,7 +23,8 @@ experiments = {
         "epochs": 15,
         "batch_size": 64,
         "lr": 0.001,
-        "scheduler": "ReduceLROnPlateau"
+        "scheduler": "ReduceLROnPlateau",
+        "reduced_classes": True
     },
     "stage_2_cnn_investigation_filters": {
         "model_type": "BaselineCNN",
@@ -43,7 +32,8 @@ experiments = {
         "epochs": 15,
         "batch_size": 64,
         "lr": 0.001,
-        "scheduler": "StepLR"
+        "scheduler": "StepLR",
+        "reduced_classes": True
     },
     "stage_2_transformer_scratch_default": {
         "model_type": "TransformerScratch",
@@ -51,7 +41,8 @@ experiments = {
         "epochs": 20,
         "batch_size": 32,
         "lr": 0.0005,
-        "scheduler": "CosineAnnealingLR"
+        "scheduler": "CosineAnnealingLR",
+        "reduced_classes": True
     },
     "stage_2_transformer_pretrained_freeze": {
         "model_type": "PretrainedTransformer",
@@ -59,6 +50,7 @@ experiments = {
         "epochs": 15,
         "batch_size": 32,
         "lr": 0.0001,
-        "scheduler": "ReduceLROnPlateau"
+        "scheduler": "ReduceLROnPlateau",
+        "reduced_classes": True
     }
 }
