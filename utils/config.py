@@ -19,7 +19,7 @@ trained_models_dir = "./trained_models"
 COMMON_BATCH_SIZE = 32
 COMMON_LR = 0.0005
 COMMON_SCHEDULER = "ReduceLROnPlateau"
-COMMON_EPOCHS = 15
+COMMON_EPOCHS = 25
 
 experiments = {
     "stage_1_baseline_cnn": {
