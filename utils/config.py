@@ -3,7 +3,7 @@ import os
 seed = 42
 
 ALL_CLASSES = ["yes", "no", "up", "down", "left", "right", "on", "off", "stop", "go", "silence", "unknown"]
-SUBSET_CLASSES = ["yes", "no", "up", "down"]
+SUBSET_CLASSES = ["yes", "no", "up", "down", "left", "right"]
 
 audio_params = {
     "sample_rate": 16000,
