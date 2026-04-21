@@ -22,43 +22,31 @@ COMMON_SCHEDULER = "ReduceLROnPlateau"
 COMMON_EPOCHS = 25
 
 experiments = {
-    "stage_1_baseline_cnn": {
+    "stage_1_cnn_search": {
         "model_type": "BaselineCNN",
         "model_params": {
-            "n_filters": 32, 
-            "drop_rate": 0.0
+            "n_filters": [16, 32],
+            "drop_rate": 0.3
         },
-        "epochs": COMMON_EPOCHS,
-        "batch_size": COMMON_BATCH_SIZE,
-        "lr": COMMON_LR,
-        "scheduler": COMMON_SCHEDULER,
+        "epochs": 15,
+        "batch_size": 32,
+        "lr": [0.001, 0.0005],
+        "scheduler": "ReduceLROnPlateau",
         "reduced_classes": True
     },
-
-    "stage_1_baseline_transformer_scratch": {
+    
+    "stage_1_transformer_scratch": {
         "model_type": "TransformerScratch",
         "model_params": {
-            "n_layers": 4,
+            "n_layers": 4, 
             "n_heads": 8, 
-            "drop_rate": 0.0,
+            "drop_rate": 0.1,
             "patch_size": 4
         },
-        "epochs": COMMON_EPOCHS,
-        "batch_size": COMMON_BATCH_SIZE,
-        "lr": COMMON_LR,
-        "scheduler": COMMON_SCHEDULER,
-        "reduced_classes": True
-    },
-
-    "stage_1_baseline_transformer_pretrained": {
-        "model_type": "PretrainedTransformer",
-        "model_params": {
-            "strategy": "none"
-        },
-        "epochs": COMMON_EPOCHS,
-        "batch_size": COMMON_BATCH_SIZE,
-        "lr": COMMON_LR,
-        "scheduler": COMMON_SCHEDULER,
+        "epochs": 15,
+        "batch_size": 32,
+        "lr": 0.0005,
+        "scheduler": "ReduceLROnPlateau",
         "reduced_classes": True
     }
 }
