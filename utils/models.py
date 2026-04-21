@@ -21,7 +21,7 @@ def get_transformer_scratch(num_classes, n_layers=4, n_heads=8, drop_rate=0.1):
     return timm.create_model(
         'vit_tiny_patch16_224', pretrained=False, in_chans=1,
         num_classes=num_classes, drop_rate=drop_rate, depth=n_layers,
-        num_heads=n_heads, img_size=(64, 32)
+        num_heads=n_heads, img_size=(64, 32), patch_size=4
     )
 
 def get_pretrained_transformer(num_classes, strategy="freeze"):
