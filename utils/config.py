@@ -60,5 +60,48 @@ experiments = {
         "lr": COMMON_LR,
         "scheduler": COMMON_SCHEDULER,
         "reduced_classes": True
+    },
+
+# 30 runs
+"stage_2_cnn_deep_search": {
+        "model_type": "BaselineCNN",
+        "model_params": {
+            "n_filters": [16, 32, 64, 128, 256, 512],
+            "drop_rate": [0.0, 0.1, 0.2, 0.3, 0.5]
+        },
+        "epochs": COMMON_EPOCHS,
+        "batch_size": COMMON_BATCH_SIZE,
+        "lr": COMMON_LR,
+        "scheduler": COMMON_SCHEDULER,
+        "reduced_classes": True                        
+    },
+
+    # 64 runs
+    "stage_2_transformer_deep_search": {
+        "model_type": "TransformerScratch",
+        "model_params": {
+            "n_layers": [2, 4, 6, 8],                   
+            "n_heads": [2, 4, 8, 16],                   
+            "drop_rate": [0.0, 0.1, 0.2, 0.3],          
+            "patch_size": 4                             
+        },
+        "epochs": COMMON_EPOCHS,
+        "batch_size": COMMON_BATCH_SIZE,
+        "lr": COMMON_LR,
+        "scheduler": COMMON_SCHEDULER,
+        "reduced_classes": True
+    },
+
+    # 3 runs
+    "stage_2_pretrained_strategy_search": {
+        "model_type": "PretrainedTransformer",
+        "model_params": {
+            "strategy": ["freeze", "partial", "none"]   # "freeze, partial, etc." 
+        },
+        "epochs": COMMON_EPOCHS,
+        "batch_size": COMMON_BATCH_SIZE,
+        "lr": COMMON_LR,
+        "scheduler": COMMON_SCHEDULER,
+        "reduced_classes": True
     }
 }
