@@ -16,41 +16,49 @@ audio_params = {
 data_dir = "/kaggle/working/train/audio"
 trained_models_dir = "./trained_models"
 
+COMMON_BATCH_SIZE = 32
+COMMON_LR = 0.0005
+COMMON_SCHEDULER = "ReduceLROnPlateau"
+COMMON_EPOCHS = 15
+
 experiments = {
-    "stage_1_baseline_cnn_default": {
+    "stage_1_baseline_cnn": {
         "model_type": "BaselineCNN",
-        "model_params": {"n_filters": 32, "drop_rate": 0.3},
-        "epochs": 15,
-        "batch_size": 64,
-        "lr": 0.001,
-        "scheduler": "ReduceLROnPlateau",
-        # "reduced_classes": True
+        "model_params": {
+            "n_filters": 32, 
+            "drop_rate": 0.0
+        },
+        "epochs": COMMON_EPOCHS,
+        "batch_size": COMMON_BATCH_SIZE,
+        "lr": COMMON_LR,
+        "scheduler": COMMON_SCHEDULER,
+        "reduced_classes": True
     },
-    "stage_2_cnn_investigation_filters": {
-        "model_type": "BaselineCNN",
-        "model_params": {"n_filters": 64, "drop_rate": 0.3},
-        "epochs": 15,
-        "batch_size": 64,
-        "lr": 0.001,
-        "scheduler": "StepLR",
-        # "reduced_classes": True
-    },
-    "stage_2_transformer_scratch_default": {
+
+    "stage_1_baseline_transformer_scratch": {
         "model_type": "TransformerScratch",
-        "model_params": {"n_layers": 4, "n_heads": 8, "drop_rate": 0.1},
-        "epochs": 20,
-        "batch_size": 32,
-        "lr": 0.0005,
-        "scheduler": "CosineAnnealingLR",
-        # "reduced_classes": True
+        "model_params": {
+            "n_layers": 4,
+            "n_heads": 8, 
+            "drop_rate": 0.1,
+            "patch_size": 4
+        },
+        "epochs": COMMON_EPOCHS,
+        "batch_size": COMMON_BATCH_SIZE,
+        "lr": COMMON_LR,
+        "scheduler": COMMON_SCHEDULER,
+        "reduced_classes": True
     },
-    "stage_2_transformer_pretrained_freeze": {
+
+    "stage_1_baseline_transformer_pretrained": {
         "model_type": "PretrainedTransformer",
-        "model_params": {"strategy": "freeze"},
-        "epochs": 15,
-        "batch_size": 32,
-        "lr": 0.0001,
-        "scheduler": "ReduceLROnPlateau",
-        # "reduced_classes": True
+        "model_params": {
+            "strategy": "none"
+        },
+        "epochs": COMMON_EPOCHS,
+        "batch_size": COMMON_BATCH_SIZE,
+        "lr": COMMON_LR,
+        "scheduler": COMMON_SCHEDULER,
+        "reduced_classes": True
     }
 }
