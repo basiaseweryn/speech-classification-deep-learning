@@ -31,8 +31,13 @@ def get_transformer_scratch(num_classes, n_layers=4, n_heads=8, drop_rate=0.0, p
     )
 
 def get_pretrained_transformer(num_classes, strategy="none"):
-    model = timm.create_model('vit_tiny_patch16_224', pretrained=True, in_chans=1, num_classes=num_classes)
-    
+    model = timm.create_model(
+            'vit_tiny_patch16_224', 
+            pretrained=True, 
+            in_chans=1, 
+            num_classes=num_classes,
+            img_size=(64, 32)
+        )    
     if strategy == "freeze":
         for param in model.parameters():
             param.requires_grad = False
