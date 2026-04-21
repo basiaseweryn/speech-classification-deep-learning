@@ -4,7 +4,7 @@ import timm
 from config import ALL_CLASSES, SUBSET_CLASSES
 
 class BaselineCNN(nn.Module):
-    def __init__(self, num_classes, n_filters=32, drop_rate=0.3):
+    def __init__(self, num_classes, n_filters=32, drop_rate=0.0):
         super().__init__()
         self.conv = nn.Sequential(
             nn.Conv2d(1, n_filters, 3, padding=1), nn.ReLU(), nn.MaxPool2d(2),
@@ -17,7 +17,7 @@ class BaselineCNN(nn.Module):
     def forward(self, x):
         return self.fc(self.conv(x).view(x.size(0), -1))
 
-def get_transformer_scratch(num_classes, n_layers=4, n_heads=8, drop_rate=0.1, patch_size=4):
+def get_transformer_scratch(num_classes, n_layers=4, n_heads=8, drop_rate=0.0, patch_size=4):
     return timm.create_model(
         'vit_tiny_patch16_224', 
         pretrained=False, 

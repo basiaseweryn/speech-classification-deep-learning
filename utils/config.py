@@ -40,7 +40,7 @@ experiments = {
         "model_params": {
             "n_layers": 4,
             "n_heads": 8, 
-            "drop_rate": 0.1,
+            "drop_rate": 0.0,
             "patch_size": 4
         },
         "epochs": COMMON_EPOCHS,
