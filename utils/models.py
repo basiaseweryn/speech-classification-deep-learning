@@ -17,18 +17,40 @@ class BaselineCNN(nn.Module):
     def forward(self, x):
         return self.fc(self.conv(x).view(x.size(0), -1))
 
-def get_transformer_scratch(num_classes, n_layers=4, n_heads=8, drop_rate=0.1):
+def get_transformer_scratch(num_classes, n_layers=4, n_heads=8, drop_rate=0.1, patch_size=4):
     return timm.create_model(
-        'vit_tiny_patch16_224', pretrained=False, in_chans=1,
-        num_classes=num_classes, drop_rate=drop_rate, depth=n_layers,
-        num_heads=n_heads, img_size=(64, 32), patch_size=4
+        'vit_tiny_patch16_224', 
+        pretrained=False, 
+        in_chans=1,
+        num_classes=num_classes, 
+        drop_rate=drop_rate, 
+        depth=n_layers,
+        num_heads=n_heads,
+        img_size=(64, 32), 
+        patch_size=patch_size
     )
 
-def get_pretrained_transformer(num_classes, strategy="freeze"):
+def get_pretrained_transformer(num_classes, strategy="none"):
     model = timm.create_model('vit_tiny_patch16_224', pretrained=True, in_chans=1, num_classes=num_classes)
+    
     if strategy == "freeze":
-        for param in model.parameters(): param.requires_grad = False
-        for param in model.head.parameters(): param.requires_grad = True
+        for param in model.parameters():
+            param.requires_grad = False
+        for param in model.head.parameters():
+            param.requires_grad = True
+            
+    elif strategy == "partial":
+        for param in model.parameters():
+            param.requires_grad = False
+        for param in model.blocks[-1].parameters():
+            param.requires_grad = True
+        for param in model.head.parameters():
+            param.requires_grad = True
+            
+    elif strategy == "none":
+        for param in model.parameters():
+            param.requires_grad = True
+            
     return model
 
 def get_model(exp_config):
