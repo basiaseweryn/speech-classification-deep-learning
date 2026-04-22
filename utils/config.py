@@ -76,13 +76,13 @@ experiments = {
         "reduced_classes": True                        
     },
 
-    # 64 runs
+    # 45 runs
     "stage_2_transformer_deep_search": {
         "model_type": "TransformerScratch",
         "model_params": {
-            "n_layers": [2, 4, 6, 8],                   
-            "n_heads": [2, 4, 8, 16],                   
-            "drop_rate": [0.0, 0.1, 0.2, 0.3],          
+            "n_layers": [2, 4, 8],
+            "n_heads": [4, 8, 16],                 
+            "drop_rate": [0.0, 0.1, 0.2, 0.3, 0.5],          
             "patch_size": 4                             
         },
         "epochs": COMMON_EPOCHS,
