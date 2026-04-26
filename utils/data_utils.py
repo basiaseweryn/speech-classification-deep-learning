@@ -3,7 +3,8 @@ import random
 import torch
 import torchaudio
 import torch.nn.functional as F
-from torch.utils.data import Dataset, DataLoader
+from torch.utils.data import Dataset, DataLoader, Subset
+from sklearn.model_selection import train_test_split
 from config import ALL_CLASSES, SUBSET_CLASSES, audio_params, data_dir
 
 class SpeechDataset(Dataset):
@@ -76,19 +77,29 @@ class SpeechDataset(Dataset):
             
         spec = self.to_db(self.transform(waveform))
         return spec, label_idx
+    
 
 def get_dataloaders(exp_config, num_workers=4):
     reduced = exp_config.get("reduced_classes", False)
     classes = SUBSET_CLASSES if reduced else ALL_CLASSES
     
+    full_ds = SpeechDataset(data_dir, classes, subset_mode=reduced)
+    
     use_pin_memory = torch.cuda.is_available()
     
-    full_ds = SpeechDataset(data_dir, classes, subset_mode=reduced)
-    train_size = int(0.8 * len(full_ds))
-    val_size = len(full_ds) - train_size
+    indices = list(range(len(full_ds)))
+    targets = [sample[1] for sample in full_ds.samples]
     
-    generator = torch.Generator().manual_seed(42)
-    train_ds, val_ds = torch.utils.data.random_split(full_ds, [train_size, val_size], generator=generator)
+    train_indices, val_indices = train_test_split(
+        indices,
+        test_size=0.2,
+        stratify=targets,
+        random_state=42,
+        shuffle=True
+    )
+    
+    train_ds = Subset(full_ds, train_indices)
+    val_ds = Subset(full_ds, val_indices)
     
     train_loader = DataLoader(
         train_ds, 
@@ -97,6 +108,7 @@ def get_dataloaders(exp_config, num_workers=4):
         num_workers=num_workers, 
         pin_memory=use_pin_memory
     )
+    
     val_loader = DataLoader(
         val_ds, 
         batch_size=exp_config["batch_size"], 
@@ -104,4 +116,5 @@ def get_dataloaders(exp_config, num_workers=4):
         num_workers=num_workers, 
         pin_memory=use_pin_memory
     )
+    
     return train_loader, val_loader
