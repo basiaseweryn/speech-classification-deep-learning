@@ -105,7 +105,7 @@ experiments = {
         "reduced_classes": True
     },
     # STAGE 4 - training on full dataset
-     "stage_4_pretrained”: {
+     "stage_4_pretrained": {
         "model_type": "PretrainedTransformer",
         "model_params": {
             "strategy": ["partial", "none"]
@@ -116,7 +116,7 @@ experiments = {
         "scheduler": COMMON_SCHEDULER,
         "reduced_classes": False
     },
-    "stage_4_cnn_1”: {. 				# best F1=0.966, small overfitting gap (0.24%), convergence in 6th epoch. main candidate
+    "stage_4_cnn_1": {. 				# best F1=0.966, small overfitting gap (0.24%), convergence in 6th epoch. main candidate
         "model_type": "BaselineCNN",
         "model_params": {
             "n_filters": 128,
@@ -128,7 +128,7 @@ experiments = {
         "scheduler": COMMON_SCHEDULER,
         "reduced_classes": False                        
     },
-    "stage_4_cnn_2”: {					# big network, no regularization
+    "stage_4_cnn_2": {					# big network, no regularization
         "model_type": "BaselineCNN",
         "model_params": {
             "n_filters": 512,
@@ -140,7 +140,7 @@ experiments = {
         "scheduler": COMMON_SCHEDULER,
         "reduced_classes": False                        
     },
-    "stage_4_cnn_3”: { 				# small network (but not the smallest possible), big regularization  
+    "stage_4_cnn_3": { 				# small network (but not the smallest possible), big regularization  
         "model_type": "BaselineCNN",
         "model_params": {
             "n_filters": 32,
@@ -153,7 +153,7 @@ experiments = {
         "reduced_classes": False                        
     },
 
-    "stage_4_transformer_1”: { 					# best F1, main candidate
+    "stage_4_transformer_1": { 					# best F1, main candidate
         "model_type": "TransformerScratch",
         "model_params": {
             "n_layers": 4,
@@ -167,7 +167,7 @@ experiments = {
         "scheduler": COMMON_SCHEDULER,
         "reduced_classes": False
     },
-    "stage_4_transformer_2”: { 					# one of the highest F1 score, but a bigger network 
+    "stage_4_transformer_2": { 					# one of the highest F1 score, but a bigger network 
         "model_type": "TransformerScratch",
         "model_params": {
             "n_layers": 8,
@@ -181,7 +181,7 @@ experiments = {
         "scheduler": COMMON_SCHEDULER,
         "reduced_classes": False
     },
-    "stage_4_transformer_3”: { 					# parameters of the main candidate but without regularization
+    "stage_4_transformer_3": { 					# parameters of the main candidate but without regularization
         "model_type": "TransformerScratch",
         "model_params": {
             "n_layers": 4,
