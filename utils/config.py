@@ -280,7 +280,7 @@ experiments.update({
         "sampling": "none"
     },
 
-    "stage_5_transformer_1_weighting": {
+    "stage_5_transformer_1_sampling": {
         "model_type": "TransformerScratch",
         "model_params": {
             "n_layers": 4,
