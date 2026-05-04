@@ -258,7 +258,7 @@ experiments.update({
         "batch_size": COMMON_BATCH_SIZE,
         "lr": COMMON_LR,
         "scheduler": COMMON_SCHEDULER,
-        "reduced_classes": True,
+        "reduced_classes": False,
         "task_type": "unknown_filter",
         "sampling": "none"
     },
@@ -275,7 +275,7 @@ experiments.update({
         "batch_size": COMMON_BATCH_SIZE,
         "lr": COMMON_LR,
         "scheduler": COMMON_SCHEDULER,
-        "reduced_classes": True,
+        "reduced_classes": False,
         "task_type": "command_specialist",
         "sampling": "none"
     },
@@ -292,7 +292,7 @@ experiments.update({
         "batch_size": COMMON_BATCH_SIZE,
         "lr": COMMON_LR,
         "scheduler": COMMON_SCHEDULER,
-        "reduced_classes": True,
+        "reduced_classes": False,
         "sampling": "weighted"
     },
 
