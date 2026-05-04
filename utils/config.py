@@ -246,5 +246,55 @@ experiments.update({
         "reduced_classes": False
     },
 
+    "stage_5_transformer_1_filter": {
+        "model_type": "TransformerScratch",
+        "model_params": {
+            "n_layers": 4,
+            "n_heads": 4,
+            "drop_rate": 0.3,
+            "patch_size": 4                             
+        },
+        "epochs": COMMON_EPOCHS,
+        "batch_size": COMMON_BATCH_SIZE,
+        "lr": COMMON_LR,
+        "scheduler": COMMON_SCHEDULER,
+        "reduced_classes": True,
+        "task_type": "unknown_filter",
+        "sampling": "none"
+    },
+
+    "stage_5_transformer_1_command": {
+        "model_type": "TransformerScratch",
+        "model_params": {
+            "n_layers": 4,
+            "n_heads": 4,
+            "drop_rate": 0.3,
+            "patch_size": 4                             
+        },
+        "epochs": COMMON_EPOCHS,
+        "batch_size": COMMON_BATCH_SIZE,
+        "lr": COMMON_LR,
+        "scheduler": COMMON_SCHEDULER,
+        "reduced_classes": True,
+        "task_type": "command_specialist",
+        "sampling": "none"
+    },
+
+    "stage_5_transformer_1_weighting": {
+        "model_type": "TransformerScratch",
+        "model_params": {
+            "n_layers": 4,
+            "n_heads": 4,
+            "drop_rate": 0.3,
+            "patch_size": 4                             
+        },
+        "epochs": COMMON_EPOCHS,
+        "batch_size": COMMON_BATCH_SIZE,
+        "lr": COMMON_LR,
+        "scheduler": COMMON_SCHEDULER,
+        "reduced_classes": True,
+        "sampling": "weighted"
+    },
+
 
 })
