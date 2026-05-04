@@ -3,17 +3,18 @@ import random
 import torch
 import torchaudio
 import torch.nn.functional as F
-from torch.utils.data import Dataset, DataLoader, Subset, WeightedRandomSampler
+from torch.utils.data import Dataset, DataLoader, WeightedRandomSampler
 from sklearn.model_selection import train_test_split
 from config import ALL_CLASSES, SUBSET_CLASSES, audio_params, data_dir
 
 class SpeechDataset(Dataset):
-    def __init__(self, data_dir, classes, config=audio_params, subset_mode=False, task_type="standard"):
+    def __init__(self, data_dir, classes, config=audio_params, subset_mode=False, task_type="standard", file_list=None):
         self.data_dir = data_dir
         self.classes = classes
         self.config = config
         self.subset_mode = subset_mode
         self.task_type = task_type
+        self.file_list = set(file_list) if file_list is not None else None
         self.samples = []
         
         self.label_to_idx = {label: i for i, label in enumerate(self.classes)}
@@ -66,6 +67,8 @@ class SpeechDataset(Dataset):
         for file in os.listdir(folder_path):
             if file.endswith(".wav"):
                 file_path = os.path.join(folder_path, file)
+                if self.file_list is not None and file_path not in self.file_list:
+                    continue
                 for _ in range(multiply):
                     self.samples.append((file_path, label_idx, is_bg))
 
@@ -91,7 +94,7 @@ class SpeechDataset(Dataset):
             
         spec = self.to_db(self.transform(waveform))
         return spec, label_idx
-    
+
 def get_dataloaders(exp_config, num_workers=4):
     reduced = exp_config.get("reduced_classes", False)
     task_type = exp_config.get("task_type", "standard")
@@ -103,26 +106,29 @@ def get_dataloaders(exp_config, num_workers=4):
     else:
         classes = SUBSET_CLASSES if reduced else ALL_CLASSES
     
-    full_ds = SpeechDataset(data_dir, classes, subset_mode=reduced, task_type=task_type)
+    all_wavs = []
+    all_labels = []
+    for folder in os.listdir(data_dir):
+        folder_path = os.path.join(data_dir, folder)
+        if not os.path.isdir(folder_path): continue
+        for f in os.listdir(folder_path):
+            if f.endswith(".wav"):
+                all_wavs.append(os.path.join(folder_path, f))
+                all_labels.append(folder)
     
-    use_pin_memory = torch.cuda.is_available()
-
-    indices = list(range(len(full_ds)))
-    targets = [sample[1] for sample in full_ds.samples]
-    
-    train_indices, val_indices = train_test_split(
-        indices, test_size=0.2, stratify=targets, random_state=42, shuffle=True
+    train_files, val_files = train_test_split(
+        all_wavs, test_size=0.2, random_state=42, shuffle=True, stratify=all_labels
     )
     
-    train_ds = Subset(full_ds, train_indices)
-    val_ds = Subset(full_ds, val_indices)
+    train_ds = SpeechDataset(data_dir, classes, subset_mode=reduced, task_type=task_type, file_list=train_files)
+    val_ds = SpeechDataset(data_dir, classes, subset_mode=reduced, task_type=task_type, file_list=val_files)
     
+    use_pin_memory = torch.cuda.is_available()
     sampler = None
     shuffle_train = True
     
     if exp_config.get("sampling") == "weighted":
-        print("turned on WeightedRandomSampler")
-        train_targets = [targets[i] for i in train_indices]
+        train_targets = [s[1] for s in train_ds.samples]
         class_counts = torch.bincount(torch.tensor(train_targets))
         class_weights = 1.0 / class_counts.float()
         sample_weights = torch.tensor([class_weights[t] for t in train_targets])
@@ -134,21 +140,7 @@ def get_dataloaders(exp_config, num_workers=4):
         )
         shuffle_train = False
     
-    train_loader = DataLoader(
-        train_ds, 
-        batch_size=exp_config["batch_size"], 
-        shuffle=shuffle_train, 
-        sampler=sampler,
-        num_workers=num_workers, 
-        pin_memory=use_pin_memory
-    )
-    
-    val_loader = DataLoader(
-        val_ds, 
-        batch_size=exp_config["batch_size"], 
-        shuffle=False, 
-        num_workers=num_workers, 
-        pin_memory=use_pin_memory
-    )
+    train_loader = DataLoader(train_ds, batch_size=exp_config["batch_size"], shuffle=shuffle_train, sampler=sampler, num_workers=num_workers, pin_memory=use_pin_memory)
+    val_loader = DataLoader(val_ds, batch_size=exp_config["batch_size"], shuffle=False, num_workers=num_workers, pin_memory=use_pin_memory)
     
     return train_loader, val_loader
