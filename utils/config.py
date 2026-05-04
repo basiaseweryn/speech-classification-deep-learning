@@ -231,5 +231,20 @@ experiments.update({
         "task_type": "command_specialist",
         "sampling": "none",
         "reduced_classes": False
-    }
+    },
+    "stage_5_cnn_1_sampling": {
+        "model_type": "BaselineCNN",
+        "model_params": {
+            "n_filters": 128, 
+            "drop_rate": 0.3
+        },
+        "epochs": COMMON_EPOCHS,
+        "batch_size": COMMON_BATCH_SIZE,
+        "lr": COMMON_LR,
+        "scheduler": COMMON_SCHEDULER,
+        "sampling": "weighted",
+        "reduced_classes": False
+    },
+
+
 })
