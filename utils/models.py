@@ -61,8 +61,15 @@ def get_pretrained_transformer(num_classes, strategy="none"):
 def get_model(exp_config):
     model_type = exp_config.get("model_type")
     params = exp_config.get("model_params", {})
-    reduced = exp_config.get("reduced_classes", False)
-    num_classes = len(SUBSET_CLASSES) if reduced else len(ALL_CLASSES)
+    task_type = exp_config.get("task_type", "standard")
+
+    if task_type == "unknown_filter":
+        num_classes = 3
+    elif task_type == "command_specialist":
+        num_classes = 10
+    else:
+        reduced = exp_config.get("reduced_classes", False)
+        num_classes = len(SUBSET_CLASSES) if reduced else len(ALL_CLASSES)
     
     if model_type == "BaselineCNN":
         return BaselineCNN(num_classes=num_classes, **params)

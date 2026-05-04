@@ -3,16 +3,17 @@ import random
 import torch
 import torchaudio
 import torch.nn.functional as F
-from torch.utils.data import Dataset, DataLoader, Subset
+from torch.utils.data import Dataset, DataLoader, Subset, WeightedRandomSampler
 from sklearn.model_selection import train_test_split
 from config import ALL_CLASSES, SUBSET_CLASSES, audio_params, data_dir
 
 class SpeechDataset(Dataset):
-    def __init__(self, data_dir, classes, config=audio_params, subset_mode=False):
+    def __init__(self, data_dir, classes, config=audio_params, subset_mode=False, task_type="standard"):
         self.data_dir = data_dir
         self.classes = classes
         self.config = config
         self.subset_mode = subset_mode
+        self.task_type = task_type
         self.samples = []
         
         self.label_to_idx = {label: i for i, label in enumerate(self.classes)}
@@ -32,19 +33,32 @@ class SpeechDataset(Dataset):
         for folder in os.listdir(self.data_dir):
             folder_path = os.path.join(self.data_dir, folder)
             if not os.path.isdir(folder_path): continue
-                
-            if self.subset_mode:
+            
+            if self.task_type == "unknown_filter":
+                if folder == "_background_noise_":
+                    self._load_files(folder_path, "silence", is_bg=True, multiply=1)
+                elif folder in core_words:
+                    self._load_files(folder_path, "command", is_bg=False)
+                else:
+                    self._load_files(folder_path, "unknown", is_bg=False)
+                    
+            elif self.task_type == "command_specialist":
                 if folder in self.classes:
                     self._load_files(folder_path, folder, is_bg=False)
-            else:
-                if folder == "_background_noise_":
-                    if "silence" in self.classes:
-                        self._load_files(folder_path, "silence", is_bg=True, multiply=400)
-                elif folder in core_words:
-                    self._load_files(folder_path, folder, is_bg=False)
+                    
+            else: 
+                if self.subset_mode:
+                    if folder in self.classes:
+                        self._load_files(folder_path, folder, is_bg=False)
                 else:
-                    if "unknown" in self.classes:
-                        self._load_files(folder_path, "unknown", is_bg=False)
+                    if folder == "_background_noise_":
+                        if "silence" in self.classes:
+                            self._load_files(folder_path, "silence", is_bg=True, multiply=400)
+                    elif folder in core_words:
+                        self._load_files(folder_path, folder, is_bg=False)
+                    else:
+                        if "unknown" in self.classes:
+                            self._load_files(folder_path, "unknown", is_bg=False)
 
     def _load_files(self, folder_path, label, is_bg=False, multiply=1):
         if label not in self.label_to_idx: return
@@ -78,33 +92,53 @@ class SpeechDataset(Dataset):
         spec = self.to_db(self.transform(waveform))
         return spec, label_idx
     
-
 def get_dataloaders(exp_config, num_workers=4):
     reduced = exp_config.get("reduced_classes", False)
-    classes = SUBSET_CLASSES if reduced else ALL_CLASSES
+    task_type = exp_config.get("task_type", "standard")
     
-    full_ds = SpeechDataset(data_dir, classes, subset_mode=reduced)
+    if task_type == "unknown_filter":
+        classes = ["silence", "unknown", "command"]
+    elif task_type == "command_specialist":
+        classes = ["yes", "no", "up", "down", "left", "right", "on", "off", "stop", "go"]
+    else:
+        classes = SUBSET_CLASSES if reduced else ALL_CLASSES
+    
+    full_ds = SpeechDataset(data_dir, classes, subset_mode=reduced, task_type=task_type)
     
     use_pin_memory = torch.cuda.is_available()
-    
+
     indices = list(range(len(full_ds)))
     targets = [sample[1] for sample in full_ds.samples]
     
     train_indices, val_indices = train_test_split(
-        indices,
-        test_size=0.2,
-        stratify=targets,
-        random_state=42,
-        shuffle=True
+        indices, test_size=0.2, stratify=targets, random_state=42, shuffle=True
     )
     
     train_ds = Subset(full_ds, train_indices)
     val_ds = Subset(full_ds, val_indices)
     
+    sampler = None
+    shuffle_train = True
+    
+    if exp_config.get("sampling") == "weighted":
+        print("turned on WeightedRandomSampler")
+        train_targets = [targets[i] for i in train_indices]
+        class_counts = torch.bincount(torch.tensor(train_targets))
+        class_weights = 1.0 / class_counts.float()
+        sample_weights = torch.tensor([class_weights[t] for t in train_targets])
+        
+        sampler = WeightedRandomSampler(
+            weights=sample_weights, 
+            num_samples=len(sample_weights), 
+            replacement=True
+        )
+        shuffle_train = False
+    
     train_loader = DataLoader(
         train_ds, 
         batch_size=exp_config["batch_size"], 
-        shuffle=True, 
+        shuffle=shuffle_train, 
+        sampler=sampler,
         num_workers=num_workers, 
         pin_memory=use_pin_memory
     )
